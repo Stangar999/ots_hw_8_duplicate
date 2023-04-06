@@ -14,9 +14,6 @@ add_executable(bayan_e main.cpp
   common.h
   duplicate_search.cpp
   duplicate_search.h
-#command_handler.h
-#log_users.h
-#observer.h
 )
 
 target_include_directories(bayan_e PRIVATE ${Boost_INCLUDE_DIRS})
