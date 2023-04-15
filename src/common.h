@@ -1,21 +1,33 @@
 ﻿#pragma once
 
+#include <boost/flyweight.hpp>
 #include <filesystem>
 #include <functional>
 #include <vector>
+
+namespace fw = boost::flyweights;
+namespace fs = std::filesystem;
 //------------------------------------------------------------------------------
 enum class HashMethod {
   //  NOINIT,
   CRC32,
   MD5,
 };
+
 //------------------------------------------------------------------------------
 struct SearchParams {
-  std::vector<std::filesystem::path> include_paths;
-  std::vector<std::filesystem::path> exclude_paths;
+ private:
+  //  struct include_paths_t {};
+  //  struct exclude_paths_t {};
+  enum class include_paths_t {};
+  enum class exclude_paths_t {};
+
+ public:
+  std::vector<fw::flyweight<fs::path, fw::tag<include_paths_t>>> include_paths;
+  std::vector<fw::flyweight<fs::path, fw::tag<exclude_paths_t>>> exclude_paths;
   uint32_t deep = 0;
   uint32_t min_file_size = 0;
-  std::vector<std::string> masks;
+  std::vector<std::string_view> masks;
   uint32_t block_size = 0;
   HashMethod hash_method = HashMethod::CRC32;
 };

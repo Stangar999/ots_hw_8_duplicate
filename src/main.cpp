@@ -15,7 +15,9 @@ int main(int argc, const char* argv[]) {
   po::variables_map vm = ParseCommandLine(argc, argv, desc);
   if (vm.count("help")) {
     std::cout << desc << '\n';
+    return 0;
   }
+
   SearchParams search_params = CreateSearchParams(vm);
   DuplicateSearcher duplicate_searcher;
   std::vector<std::vector<std::string>> duplicates;

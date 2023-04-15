@@ -9,15 +9,6 @@
 
 namespace {
 namespace po = boost::program_options;
-
-// const string scan_dir("scan_dir"s);
-// const string exlude_dir("exlude_dir"s);
-// const string deep_scan("deep_scan");
-// const string min_fsize("min_fsize");
-// const string file_masks("file_masks");
-// const string block_size("block_size");
-// const string crc32("crc32");
-// const string md5("md5");
 //------------------------------------------------------------------------------
 // создает описание возможных параметров
 static po::options_description CreateDescription() {
@@ -46,24 +37,23 @@ static po::variables_map ParseCommandLine(int argc, const char* argv[],
     po::store(parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
   } catch (const std::exception& e) {
-    std::cerr << e.what() << std::endl;
+    std::cout << e.what() << std::endl;
+    std::cout << desc << '\n';
   }
   return vm;
 }
 //------------------------------------------------------------------------------
 // парсит словарь со считанными параметрами и складывает в структуру
 static SearchParams CreateSearchParams(const po::variables_map& vm) {
+  auto getMany = [](const po::variable_value& variable, auto& dest) {
+    const auto& container = variable.as<std::vector<std::string>>();
+    dest.assign(container.begin(), container.end());
+  };
   SearchParams search_params;
   if (vm.count("scan_dir")) {
-    // TODO копии!
-    search_params.include_paths.assign(
-        vm["scan_dir"].as<std::vector<std::string>>().begin(),
-        vm["scan_dir"].as<std::vector<std::string>>().end());
+    getMany(vm["scan_dir"], search_params.include_paths);
     if (vm.count("exlude_dir")) {
-      // TODO копии!
-      search_params.exclude_paths.assign(
-          vm["exlude_dir"].as<std::vector<std::string>>().begin(),
-          vm["exlude_dir"].as<std::vector<std::string>>().end());
+      getMany(vm["exlude_dir"], search_params.exclude_paths);
     }
     if (vm.count("deep_scan")) {
       search_params.deep = vm["deep_scan"].as<uint32_t>();
@@ -72,10 +62,7 @@ static SearchParams CreateSearchParams(const po::variables_map& vm) {
       search_params.min_file_size = vm["min_fsize"].as<uint32_t>();
     }
     if (vm.count("file_masks")) {
-      // TODO копии!
-      search_params.masks.assign(
-          vm["file_masks"].as<std::vector<std::string>>().begin(),
-          vm["file_masks"].as<std::vector<std::string>>().end());
+      getMany(vm["file_masks"], search_params.masks);
     }
     if (vm.count("block_size")) {
       search_params.block_size = vm["block_size"].as<uint32_t>();

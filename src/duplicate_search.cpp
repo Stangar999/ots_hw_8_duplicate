@@ -140,16 +140,16 @@ std::string DuplicateSearcher::GetHash(FileParams& f_p) const {
   // перемечаем начало считывание на последнее место остановки
   file.ignore(f_p.curr_pos);
   // массив для заполнения
-  char* block = new char[block_size];
-  file.read(block, block_size);
-  // обновляем позицию до куда считали
+  std::string block(block_size, '\0');
+  file.read(block.data(), block_size);
+  // обновляем позицию докуда считали
   f_p.curr_pos += file.gcount();
   // если не удалось полностью считать запланированный блок
   if (file.gcount() < block_size) {
     // то если файл закончился, заполняем нулями оставшийся хвост
     // и устанавливаем флаг конца
     if (file.eof()) {
-      std::fill(block + file.gcount(), block + block_size, '\0');
+      std::fill(block.data() + file.gcount(), block.data() + block_size, '\0');
       f_p.is_end = true;
       // иначе устанавливаем флаг плохого файла
     } else {
@@ -158,7 +158,7 @@ std::string DuplicateSearcher::GetHash(FileParams& f_p) const {
       return "";
     }
   }
-  return BlockToString(block);
+  return BlockToString(block.data());
 }
 //------------------------------------------------------------------------------
 void DuplicateSearcher::CrateHashes(BoostBimap& hashes,
